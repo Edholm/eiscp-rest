@@ -4,9 +4,9 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import pub.edholm.eiscprest.eiscp.CommonCommands
 import pub.edholm.eiscprest.queues.InputQueue
 import pub.edholm.eiscprest.queues.OutputQueue
-import pub.edholm.eiscprest.eiscp.ISCPCommand
 
 @RestController
 @RequestMapping("/power")
@@ -15,17 +15,17 @@ class PowerController(private val outputQueue: OutputQueue,
 
   @GetMapping("/query")
   fun getPowerStatus(): String {
-    outputQueue.put(ISCPCommand(command = "!1PWR", payload = "QSTN"))
+    outputQueue.put(CommonCommands.powerStatus())
     return inputQueue.pop().toString()
   }
 
   @PostMapping("/on")
   fun powerOn() {
-    outputQueue.put(ISCPCommand(command = "!1PWR", payload = "01"))
+    outputQueue.put(CommonCommands.powerOn())
   }
 
   @PostMapping("/off")
   fun powerOff() {
-    outputQueue.put(ISCPCommand(command = "!1PWR", payload = "00"))
+    outputQueue.put(CommonCommands.powerOff())
   }
 }
