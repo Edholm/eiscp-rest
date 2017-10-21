@@ -18,7 +18,7 @@ class EiscpRestApplication {
 
   @Bean(name = arrayOf("senderThread"))
   fun getSenderThread(socket: Socket, outputQueue: OutputQueue): Thread {
-    return Thread {
+    val thread = Thread {
       val output = socket.getOutputStream()
       while (!socket.isClosed) {
         val nextCmdToSend = outputQueue.pop()
@@ -28,11 +28,13 @@ class EiscpRestApplication {
         output.flush()
       }
     }
+    thread.name = "ISCP Sender thread"
+    return thread
   }
 
   @Bean(name = arrayOf("receiverThread"))
   fun getReceiverThread(socket: Socket, inputQueue: InputQueue): Thread {
-    return Thread {
+    val receiverThread = Thread {
       val input = DataInputStream(socket.getInputStream())
       while (!socket.isClosed) {
         val headerBytes = ByteArray(ISCPHeader.DEFAULT_SIZE)
@@ -61,6 +63,8 @@ class EiscpRestApplication {
         inputQueue.put(msg)
       }
     }
+    receiverThread.name = "ISCP receiver thread"
+    return receiverThread
   }
 
   @Bean
