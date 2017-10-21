@@ -5,19 +5,21 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import pub.edholm.eiscprest.CurrentState
 import pub.edholm.eiscprest.eiscp.CommonCommands
 import pub.edholm.eiscprest.queues.OutputQueue
 
 @RestController
 @RequestMapping("/power")
 class PowerController(private val outputQueue: OutputQueue,
+                      private val currentState: CurrentState,
                       private val log: Logger = Logger.getLogger(PowerController::class.java)) {
 
-  @GetMapping("/query")
-  fun getPowerStatus(): String {
+  @GetMapping
+  fun getPowerStatus(): Map<String, Any?> {
     log.trace("Power query")
     outputQueue.put(CommonCommands.powerStatus())
-    return "" // Return actual value
+    return mapOf("powered" to currentState["powered"])
   }
 
   @PostMapping("/on")
