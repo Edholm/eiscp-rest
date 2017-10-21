@@ -13,7 +13,7 @@ class Application {
 
   private val log = Logger.getLogger(Application::class.java)
 
-  @Bean
+  @Bean(name = arrayOf("receiverSocket"))
   fun getSocket() = Socket("10.10.10.57", 60128)
 
   @Bean
