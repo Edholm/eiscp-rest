@@ -22,6 +22,8 @@ class EiscpRestApplication {
       val output = socket.getOutputStream()
       while (!socket.isClosed) {
         val nextCmdToSend = outputQueue.pop()
+        println("Sending $nextCmdToSend")
+        output.write(ISCPHeader(messageSize = nextCmdToSend.size()).toByteArray())
         output.write(nextCmdToSend.toByteArray())
         output.flush()
       }

@@ -3,7 +3,7 @@ package pub.edholm.eiscprest.eiscp
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
-data class ISCPCommand(val command: String, val payload: String) {
+data class ISCPCommand(val command: String, val payload: String = "") {
   companion object {
     private const val SUFFIX_LEN = 2
     private const val CMD_LENGTH = 5
@@ -35,6 +35,8 @@ data class ISCPCommand(val command: String, val payload: String) {
     assertValid()
     return command.substring(2, CMD_LENGTH)
   }
+
+  fun size() = command.length + payload.length
 
   private fun assertValid() {
     if (!isValid()) {

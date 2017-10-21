@@ -26,7 +26,7 @@ data class ISCPHeader(val magicStr: String = DEFAULT_MAGIC_STR,
   /** Includes three reserved bytes at the end */
   fun toByteArray(): ByteArray {
     val bb = ByteBuffer.allocate(headerSize)
-    magicStr.forEach { bb.putChar(it) }
+    magicStr.forEach { bb.put(it.toByte()) }
     bb.putInt(headerSize)
     bb.putInt(messageSize)
     bb.put(version)
