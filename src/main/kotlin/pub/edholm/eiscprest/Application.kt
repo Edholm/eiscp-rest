@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 import pub.edholm.eiscprest.queues.CommandProcessor
 import java.net.Socket
+import java.util.concurrent.locks.ReentrantLock
 
 @SpringBootApplication
 class Application {
@@ -15,6 +16,12 @@ class Application {
 
   @Bean(name = arrayOf("receiverSocket"))
   fun getSocket() = Socket("10.10.10.57", 60128)
+
+  @Bean
+  fun getCurrentState(reentrantLock: ReentrantLock) = CurrentState(update = reentrantLock)
+
+  @Bean(name = arrayOf("updateStateLock"))
+  fun getUpdateStateLock() = ReentrantLock()
 
   @Bean
   fun initThreads(receiver: ReceiverThread, sender: SenderThread, commandProcessor: CommandProcessor) = CommandLineRunner {

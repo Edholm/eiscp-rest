@@ -1,24 +1,38 @@
 package pub.edholm.eiscprest
 
 import org.apache.log4j.Logger
-import org.springframework.stereotype.Component
+import org.springframework.beans.factory.annotation.Qualifier
 import pub.edholm.eiscprest.eiscp.Command
 import pub.edholm.eiscprest.eiscp.ISCPCommand
+import java.nio.channels.InterruptedByTimeoutException
 import java.time.Instant
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
-@Component
-class CurrentState(private val state: MutableMap<String, Any> = mutableMapOf("lastUpdated" to Instant.now()),
+class CurrentState(val state: MutableMap<String, Any> = mutableMapOf("lastUpdated" to Instant.now()),
+                   @Qualifier("updateStateLock")
+                   private val update: ReentrantLock,
+                   private val valueUpdatedLock: BlockingQueue<Boolean> = ArrayBlockingQueue(1),
                    private val log: Logger = Logger.getLogger(CurrentState::class.java)) {
 
   fun updateState(cmd: ISCPCommand) {
-    when (cmd.command) {
-      Command.MASTER_VOLUME -> updateMasterVolume(cmd)
-      Command.POWER -> updatePower(cmd)
-      Command.INPUT_SELECTOR -> updateInputSelector(cmd)
-      else -> log.debug("Unknown cmd: $cmd")
+    update.withLock {
+      when (cmd.command) {
+        Command.MASTER_VOLUME -> updateMasterVolume(cmd)
+        Command.AUDIO_MUTING -> updateMuted(cmd)
+        Command.POWER -> updatePower(cmd)
+        Command.INPUT_SELECTOR -> updateInputSelector(cmd)
+        else -> {
+          log.trace("Ignoring unknown command: $cmd")
+          return
+        }
+      }
+      valueUpdatedLock.put(true)
+      updateLastUpdatedTimestamp()
     }
-
-    updateLastUpdatedTimestamp()
   }
 
   private fun updateMasterVolume(volume: ISCPCommand) {
@@ -41,7 +55,19 @@ class CurrentState(private val state: MutableMap<String, Any> = mutableMapOf("la
     state["lastUpdated"] = Instant.now()
   }
 
-  operator fun get(key: String): Any? {
-    return this.state[key]
+  private fun waitUntilValueExists(key: String): Any {
+    while (state[key] == null) {
+      log.trace("Value for key=$key does not exist yet, blocking...")
+      if (valueUpdatedLock.poll(5, TimeUnit.SECONDS) == null) {
+        throw InterruptedByTimeoutException()
+      }
+    }
+    val value = state[key]
+    log.trace("Found $key=$value")
+    return value as Any
+  }
+
+  operator fun get(key: String): Any {
+    return waitUntilValueExists(key)
   }
 }
