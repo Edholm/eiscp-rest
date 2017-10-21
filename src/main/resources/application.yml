@@ -3,6 +3,10 @@ spring:
     ansi:
       enabled: ALWAYS
 
+logging:
+  level:
+    pub.edholm.eiscprest: ${LOG_LEVEL:DEBUG}
+
 eiscp:
   receiver:
     hostname: 10.10.10.57

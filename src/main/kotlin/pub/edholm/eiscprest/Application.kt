@@ -1,5 +1,6 @@
 package pub.edholm.eiscprest
 
+import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
@@ -13,6 +14,8 @@ import java.net.Socket
 @SpringBootApplication
 class Application {
 
+  private val log = Logger.getLogger(Application::class.java)
+
   @Bean
   fun getSocket() = Socket("10.10.10.57", 60128)
 
@@ -22,13 +25,13 @@ class Application {
       val output = socket.getOutputStream()
       while (!socket.isClosed) {
         val nextCmdToSend = outputQueue.pop()
-        println("Sending $nextCmdToSend")
+        log.debug("Sending $nextCmdToSend")
         output.write(ISCPHeader(messageSize = nextCmdToSend.size()).toByteArray())
         output.write(nextCmdToSend.toByteArray())
         output.flush()
       }
     }
-    thread.name = "ISCP Sender thread"
+    thread.name = "msgSender"
     return thread
   }
 
@@ -40,30 +43,29 @@ class Application {
         val headerBytes = ByteArray(ISCPHeader.DEFAULT_SIZE)
         val readHeaderBytes = input.readNBytes(headerBytes, 0, ISCPHeader.DEFAULT_SIZE)
         if (readHeaderBytes != ISCPHeader.DEFAULT_SIZE) {
-          println("Could not read message header from socket. Expected ${ISCPHeader.DEFAULT_SIZE}, got $readHeaderBytes")
+          log.warn("Could not read message header from socket. Expected ${ISCPHeader.DEFAULT_SIZE}, got $readHeaderBytes")
           continue
         }
         val header = ISCPHeader.valueOf(headerBytes)
         if (!header.isValid()) {
-          println("Got invalid Header: $header")
+          log.warn("Got invalid Header: $header")
           continue
         }
 
         val messageBytes = ByteArray(header.messageSize)
         val readMessageBytes = input.readNBytes(messageBytes, 0, messageBytes.size)
         if (readHeaderBytes != ISCPHeader.DEFAULT_SIZE) {
-          println("Could not read message data from socket. Expected ${header.messageSize}, got $readMessageBytes")
+          log.warn("Could not read message data from socket. Expected ${header.messageSize}, got $readMessageBytes")
           continue
         }
         val msg = ISCPCommand.valueOf(messageBytes)
 
-        println("Got the following message")
-        println(header)
-        println(msg)
+        log.trace("Message header: $header")
+        log.debug("Received $msg")
         inputQueue.put(msg)
       }
     }
-    receiverThread.name = "ISCP receiver thread"
+    receiverThread.name = "msgReceiver"
     return receiverThread
   }
 
