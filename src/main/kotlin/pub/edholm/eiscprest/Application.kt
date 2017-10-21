@@ -11,7 +11,7 @@ import java.io.DataInputStream
 import java.net.Socket
 
 @SpringBootApplication
-class EiscpRestApplication {
+class Application {
 
   @Bean
   fun getSocket() = Socket("10.10.10.57", 60128)
@@ -76,5 +76,5 @@ class EiscpRestApplication {
 }
 
 fun main(args: Array<String>) {
-  SpringApplication.run(EiscpRestApplication::class.java, *args)
+  SpringApplication.run(Application::class.java, *args)
 }
