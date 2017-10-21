@@ -4,6 +4,7 @@ import org.apache.log4j.Logger
 import org.springframework.stereotype.Component
 import pub.edholm.eiscprest.eiscp.ISCPCommand
 import pub.edholm.eiscprest.eiscp.ISCPHeader
+import pub.edholm.eiscprest.queues.InputQueue
 import java.io.DataInputStream
 import java.net.Socket
 

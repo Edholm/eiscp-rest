@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import pub.edholm.eiscprest.InputQueue
-import pub.edholm.eiscprest.OutputQueue
+import pub.edholm.eiscprest.queues.InputQueue
+import pub.edholm.eiscprest.queues.OutputQueue
 import pub.edholm.eiscprest.eiscp.ISCPCommand
 
 @RestController

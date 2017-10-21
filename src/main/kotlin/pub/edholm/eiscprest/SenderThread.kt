@@ -3,6 +3,7 @@ package pub.edholm.eiscprest
 import org.apache.log4j.Logger
 import org.springframework.stereotype.Component
 import pub.edholm.eiscprest.eiscp.ISCPHeader
+import pub.edholm.eiscprest.queues.OutputQueue
 import java.net.Socket
 
 @Component

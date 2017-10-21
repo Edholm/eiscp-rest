@@ -1,4 +1,4 @@
-package pub.edholm.eiscprest
+package pub.edholm.eiscprest.queues
 
 import pub.edholm.eiscprest.eiscp.ISCPCommand
 import java.util.concurrent.ArrayBlockingQueue
