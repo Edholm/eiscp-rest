@@ -30,7 +30,7 @@ class CurrentState(val state: MutableMap<String, Any> = mutableMapOf("lastUpdate
           return
         }
       }
-      valueUpdatedLock.put(true)
+      valueUpdatedLock.offer(true, 0, TimeUnit.SECONDS)
       updateLastUpdatedTimestamp()
     }
   }

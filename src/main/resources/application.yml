@@ -3,6 +3,11 @@ spring:
     ansi:
       enabled: ALWAYS
 
+spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
 logging:
   level:
     pub.edholm.eiscprest: ${LOG_LEVEL:DEBUG}
