@@ -1,5 +1,6 @@
 package pub.edholm.eiscprest
 
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -11,43 +12,60 @@ import java.net.Socket
 
 @SpringBootApplication
 class EiscpRestApplication {
+
   @Bean
-  fun cmdRunner() = CommandLineRunner {
-    val socket = Socket("10.10.10.57", 60128)
-    val out = socket.getOutputStream()
-    //println("Sending power query")
-    //val msg = Command(Type.POWER_QUERY).toByteArray()
-    //println(msg.contentToString())
-    //out.write(msg)
-    //out.flush()
+  fun getSocket() = Socket("10.10.10.57", 60128)
 
-    val connected = true
-    val input = DataInputStream(socket.getInputStream())
-
-    while (connected) {
-      val headerBytes = ByteArray(ISCPHeader.DEFAULT_SIZE)
-      val readHeaderBytes = input.readNBytes(headerBytes, 0, ISCPHeader.DEFAULT_SIZE)
-      if (readHeaderBytes != ISCPHeader.DEFAULT_SIZE) {
-        println("Could not read message header from socket. Expected ${ISCPHeader.DEFAULT_SIZE}, got $readHeaderBytes")
-        continue
+  @Bean(name = arrayOf("senderThread"))
+  fun getSenderThread(socket: Socket, outputQueue: OutputQueue): Thread {
+    return Thread {
+      val output = socket.getOutputStream()
+      while (!socket.isClosed) {
+        val nextCmdToSend = outputQueue.pop()
+        output.write(nextCmdToSend.toByteArray())
+        output.flush()
       }
-      val header = ISCPHeader.valueOf(headerBytes)
-
-      val messageBytes = ByteArray(header.messageSize)
-      val readMessageBytes = input.readNBytes(messageBytes, 0, messageBytes.size)
-      if (readHeaderBytes != ISCPHeader.DEFAULT_SIZE) {
-        println("Could not read message data from socket. Expected ${header.messageSize}, got $readMessageBytes")
-        continue
-      }
-      val msg = ISCPCommand.valueOf(messageBytes)
-
-      println("Got the following message")
-      println(header)
-      println(msg)
     }
+  }
 
-    println("Closing socket")
-    socket.close()
+  @Bean(name = arrayOf("receiverThread"))
+  fun getReceiverThread(socket: Socket, inputQueue: InputQueue): Thread {
+    return Thread {
+      val input = DataInputStream(socket.getInputStream())
+      while (!socket.isClosed) {
+        val headerBytes = ByteArray(ISCPHeader.DEFAULT_SIZE)
+        val readHeaderBytes = input.readNBytes(headerBytes, 0, ISCPHeader.DEFAULT_SIZE)
+        if (readHeaderBytes != ISCPHeader.DEFAULT_SIZE) {
+          println("Could not read message header from socket. Expected ${ISCPHeader.DEFAULT_SIZE}, got $readHeaderBytes")
+          continue
+        }
+        val header = ISCPHeader.valueOf(headerBytes)
+        if (!header.isValid()) {
+          println("Got invalid Header: $header")
+          continue
+        }
+
+        val messageBytes = ByteArray(header.messageSize)
+        val readMessageBytes = input.readNBytes(messageBytes, 0, messageBytes.size)
+        if (readHeaderBytes != ISCPHeader.DEFAULT_SIZE) {
+          println("Could not read message data from socket. Expected ${header.messageSize}, got $readMessageBytes")
+          continue
+        }
+        val msg = ISCPCommand.valueOf(messageBytes)
+
+        println("Got the following message")
+        println(header)
+        println(msg)
+        inputQueue.put(msg)
+      }
+    }
+  }
+
+  @Bean
+  fun initThreads(@Qualifier("receiverThread") receiver: Thread,
+                  @Qualifier("senderThread") sender: Thread) = CommandLineRunner {
+    receiver.start()
+    sender.start()
   }
 }
 
