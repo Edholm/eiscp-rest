@@ -12,6 +12,14 @@ import java.net.Socket
 class ReceiverThread(private val socket: Socket,
                      private val inputQueue: InputQueue,
                      private val log: Logger = Logger.getLogger(ReceiverThread::class.java)) : Thread("msgReceiver") {
+
+  private fun assertSocketNotClosed() {
+    Thread.sleep(2500)
+    if (socket.isClosed) {
+      throw IllegalStateException("Receiver socket has been closed...")
+    }
+  }
+
   override fun run() {
     val input = DataInputStream(socket.getInputStream())
     while (!socket.isClosed) {
@@ -19,6 +27,7 @@ class ReceiverThread(private val socket: Socket,
       val readHeaderBytes = input.readNBytes(headerBytes, 0, ISCPHeader.DEFAULT_SIZE)
       if (readHeaderBytes != ISCPHeader.DEFAULT_SIZE) {
         log.warn("Could not read message header from socket. Expected ${ISCPHeader.DEFAULT_SIZE}, got $readHeaderBytes")
+        assertSocketNotClosed()
         continue
       }
       val header = ISCPHeader.valueOf(headerBytes)
@@ -31,6 +40,7 @@ class ReceiverThread(private val socket: Socket,
       val readMessageBytes = input.readNBytes(messageBytes, 0, messageBytes.size)
       if (readHeaderBytes != ISCPHeader.DEFAULT_SIZE) {
         log.warn("Could not read message data from socket. Expected ${header.messageSize}, got $readMessageBytes")
+        assertSocketNotClosed()
         continue
       }
       val msg = ISCPCommand.valueOf(messageBytes)
