@@ -15,7 +15,10 @@ class Application {
   private val log = Logger.getLogger(Application::class.java)
 
   @Bean(name = arrayOf("receiverSocket"))
-  fun getSocket() = Socket("10.10.10.57", 60128)
+  fun getSocket(properties: Properties): Socket {
+    log.trace("Connecting to ${properties.receiver.hostname}:${properties.receiver.port}")
+    return Socket(properties.receiver.hostname, properties.receiver.port)
+  }
 
   @Bean
   fun getCurrentState(reentrantLock: ReentrantLock) = CurrentState(update = reentrantLock)
