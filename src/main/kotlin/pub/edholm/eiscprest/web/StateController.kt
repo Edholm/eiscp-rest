@@ -16,14 +16,17 @@ class StateController(private val outputQueue: OutputQueue,
                       private val currentState: CurrentState,
                       private val log: Logger = Logger.getLogger(StateController::class.java)) {
   @GetMapping
-  fun currentState() = currentState.state
+  fun currentState() = requestStateUpdate()
 
   @PostMapping
-  fun requestStateUpdate() {
+  fun requestStateUpdate(): Map<String, Any> {
     log.trace("Request state update")
+    currentState.clearState()
+
     outputQueue.put(ISCPCommand(Command.AUDIO_MUTING, "QSTN"))
     outputQueue.put(ISCPCommand(Command.MASTER_VOLUME, "QSTN"))
     outputQueue.put(ISCPCommand(Command.POWER, "QSTN"))
     outputQueue.put(ISCPCommand(Command.INPUT_SELECTOR, "QSTN"))
+    return currentState.current()
   }
 }

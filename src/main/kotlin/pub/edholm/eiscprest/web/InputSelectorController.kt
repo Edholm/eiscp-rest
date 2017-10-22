@@ -45,7 +45,7 @@ class InputSelectorController(private val outputQueue: OutputQueue,
       .filter {
         it.value == inputDesc
       }
-      .reduce { a, b ->
+      .reduce { _, _ ->
         throw IllegalArgumentException("$inputDesc corresponds to multiple inputs")
       }
       .key
