@@ -19,11 +19,11 @@ class CurrentState(private val state: MutableMap<String, Any> = mutableMapOf("la
                    private val log: Logger = Logger.getLogger(CurrentState::class.java)) {
 
   companion object {
-    private const val MASTER_VOLUME = "masterVolume"
-    private const val IS_MUTED = "isMuted"
-    private const val IS_POWERED = "isPowered"
-    private const val CURRENT_INPUT = "currentInput"
-    private const val LAST_UPDATED = "lastUpdated"
+    const val MASTER_VOLUME = "masterVolume"
+    const val IS_MUTED = "isMuted"
+    const val IS_POWERED = "isPowered"
+    const val CURRENT_INPUT = "currentInput"
+    const val LAST_UPDATED = "lastUpdated"
   }
 
   fun current(): Map<String, Any> {

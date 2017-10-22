@@ -33,4 +33,21 @@ class PowerController(private val outputQueue: OutputQueue,
     log.trace("Power off")
     outputQueue.put(CommonCommands.powerOff())
   }
+
+  @PostMapping("/toggle")
+  fun togglePower(): Map<String, Any?> {
+    log.trace("Toggle power")
+
+    currentState.clearState(CurrentState.IS_POWERED)
+    outputQueue.put(CommonCommands.powerQuery())
+    if (currentState.isPowered()) {
+      currentState.clearState(CurrentState.IS_POWERED)
+      powerOff()
+    } else {
+      currentState.clearState(CurrentState.IS_POWERED)
+      powerOn()
+    }
+
+    return mapOf("powered" to currentState.isPowered())
+  }
 }

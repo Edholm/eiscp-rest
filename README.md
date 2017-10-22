@@ -13,6 +13,7 @@ Currently supports the following features
 GET /power
 POST /power/on
 POST /power/off
+POST /power/toggle
 ```
 ### Volume
 ```
