@@ -19,7 +19,7 @@ class VolumeController(private val outputQueue: OutputQueue,
   fun currentVolume(): Int {
     log.trace("Fetch current volume")
     outputQueue.put(ISCPCommand(Command.MASTER_VOLUME, "QSTN"))
-    return currentState["masterVolume"] as Int
+    return currentState.masterVolume()
   }
 
   @PostMapping("/increase")
@@ -38,7 +38,7 @@ class VolumeController(private val outputQueue: OutputQueue,
   fun isMuted(): Boolean {
     log.trace("Is muted")
     outputQueue.put(ISCPCommand(Command.AUDIO_MUTING, "QSTN"))
-    return currentState["isMuted"] as Boolean
+    return currentState.isMuted()
   }
 
   @PostMapping("/toggle-mute")

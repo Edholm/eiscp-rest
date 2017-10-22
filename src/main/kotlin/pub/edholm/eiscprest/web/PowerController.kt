@@ -18,8 +18,8 @@ class PowerController(private val outputQueue: OutputQueue,
   @GetMapping
   fun getPowerStatus(): Map<String, Any?> {
     log.trace("Power query")
-    outputQueue.put(CommonCommands.powerStatus())
-    return mapOf("powered" to currentState["powered"])
+    outputQueue.put(CommonCommands.powerQuery())
+    return mapOf("powered" to currentState.isPowered())
   }
 
   @PostMapping("/on")

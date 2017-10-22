@@ -44,16 +44,21 @@ class CurrentState(val state: MutableMap<String, Any> = mutableMapOf("lastUpdate
   }
 
   private fun updatePower(powerState: ISCPCommand) {
-    state["powered"] = powerState.payload == "01"
+    state["isPowered"] = powerState.payload == "01"
   }
 
   private fun updateInputSelector(inputSelector: ISCPCommand) {
-    state["input"] = inputSelector.payloadDescription() ?: "UNKNOWN_INPUT"
+    state["currentInput"] = inputSelector.payloadDescription() ?: "UNKNOWN_INPUT"
   }
 
   private fun updateLastUpdatedTimestamp() {
     state["lastUpdated"] = Instant.now()
   }
+
+  fun masterVolume() = this["masterVolume"] as Int
+  fun isMuted() = this["isMuted"] as Boolean
+  fun isPowered() = this["isPowered"] as Boolean
+  fun currentInput() = this["currentInput"] as String
 
   private fun waitUntilValueExists(key: String): Any {
     while (state[key] == null) {
@@ -67,7 +72,7 @@ class CurrentState(val state: MutableMap<String, Any> = mutableMapOf("lastUpdate
     return value as Any
   }
 
-  operator fun get(key: String): Any {
+  private operator fun get(key: String): Any {
     return waitUntilValueExists(key)
   }
 }
