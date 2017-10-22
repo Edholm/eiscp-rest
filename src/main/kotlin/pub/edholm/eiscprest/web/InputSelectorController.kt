@@ -1,11 +1,11 @@
 package pub.edholm.eiscprest.web
 
 import org.apache.log4j.Logger
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import pub.edholm.eiscprest.CurrentState
+import pub.edholm.eiscprest.eiscp.Command
 import pub.edholm.eiscprest.eiscp.CommonCommands
+import pub.edholm.eiscprest.eiscp.ISCPCommand
 import pub.edholm.eiscprest.queues.OutputQueue
 
 @RestController
@@ -18,5 +18,36 @@ class InputSelectorController(private val outputQueue: OutputQueue,
     log.trace("Get current input")
     outputQueue.put(CommonCommands.inputSelectorQuery())
     return currentState.currentInput()
+  }
+
+  @PostMapping("/next")
+  fun switchInputUp() {
+    log.trace("Switch to next input")
+    outputQueue.put(ISCPCommand(Command.INPUT_SELECTOR, "UP"))
+  }
+
+  @PostMapping("/previous")
+  fun switchInputDown() {
+    log.trace("Switch to previous input")
+    outputQueue.put(ISCPCommand(Command.INPUT_SELECTOR, "DOWN"))
+  }
+
+  @PostMapping("/{newInput}")
+  fun switchInput(@PathVariable newInput: String) {
+    log.trace("Switch input to $newInput")
+    val input = lookupInputFromDescription(newInput)
+    outputQueue.put(ISCPCommand(Command.INPUT_SELECTOR, input))
+  }
+
+  private fun lookupInputFromDescription(inputDesc: String): String {
+    return Command.INPUT_SELECTOR.payloadDesc
+      .entries
+      .filter {
+        it.value == inputDesc
+      }
+      .reduce { a, b ->
+        throw IllegalArgumentException("$inputDesc corresponds to multiple inputs")
+      }
+      .key
   }
 }
