@@ -39,6 +39,12 @@ class InputSelectorController(private val outputQueue: OutputQueue,
     outputQueue.put(ISCPCommand(Command.INPUT_SELECTOR, input))
   }
 
+  @GetMapping("/available")
+  fun getAvailableInputs(): Collection<String> {
+    log.trace("Get available inputs")
+    return Command.INPUT_SELECTOR.payloadDesc.values
+  }
+
   private fun lookupInputFromDescription(inputDesc: String): String {
     return Command.INPUT_SELECTOR.payloadDesc
       .entries

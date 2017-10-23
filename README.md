@@ -29,6 +29,7 @@ GET /input
 POST /input/next
 POST /input/previous
 POST /input/{newInput}  # I.e. PC or STRM_BOX
+GET /input/available
 ```
 ### Current state
 Fetch or request new states. I.e volume, power, input etc.
