@@ -18,6 +18,7 @@ POST /power/toggle
 ### Volume
 ```
 GET /volume
+POST /volume/{newVolume}
 POST /volume/increase
 POST /volume/decrease
 GET /volume/is-muted

@@ -1,10 +1,7 @@
 package pub.edholm.eiscprest.web
 
 import org.apache.log4j.Logger
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import pub.edholm.eiscprest.CurrentState
 import pub.edholm.eiscprest.eiscp.Command
 import pub.edholm.eiscprest.eiscp.ISCPCommand
@@ -19,6 +16,17 @@ class VolumeController(private val outputQueue: OutputQueue,
   fun currentVolume(): Int {
     log.trace("Fetch current volume")
     outputQueue.put(ISCPCommand(Command.MASTER_VOLUME, "QSTN"))
+    return currentState.masterVolume()
+  }
+
+  @PostMapping("/{newVolume}")
+  fun setVolume(@PathVariable newVolume: Int): Int {
+    val newVolumeHex = newVolume.toTwoCharHex()
+    log.trace("Set volume to $newVolume, as hex: $newVolumeHex")
+    if (newVolume < 0 || newVolume > 100) {
+      throw IllegalArgumentException("Invalid volume. Expected 0<x<100, got $newVolume")
+    }
+    outputQueue.put(ISCPCommand(Command.MASTER_VOLUME, newVolumeHex))
     return currentState.masterVolume()
   }
 
@@ -47,4 +55,11 @@ class VolumeController(private val outputQueue: OutputQueue,
     outputQueue.put(ISCPCommand(Command.AUDIO_MUTING, "TG"))
   }
 
+  private fun Int.toTwoCharHex(): String {
+    val asHex = this.toString(16)
+    return when {
+      asHex.length < 2 -> "0" + asHex
+      else -> asHex
+    }
+  }
 }
