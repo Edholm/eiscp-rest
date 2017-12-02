@@ -37,4 +37,5 @@ Fetch or request new states. I.e volume, power, input etc.
 ```
 GET /state
 POST /state
+GET /state/updates    # SSE endpoint which publishes all state changes as they happen
 ```
