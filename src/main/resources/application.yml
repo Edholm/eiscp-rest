@@ -6,14 +6,11 @@ spring:
     ansi:
       enabled: ALWAYS
 
-spring:
-  jackson:
-    serialization:
-      write-dates-as-timestamps: false
-
 logging:
+  pattern:
+    level: '%5p%X{reqId}'
   level:
-    pub.edholm.eiscprest: ${LOG_LEVEL:DEBUG}
+    pub.edholm.eiscprest: ${LOG_LEVEL:TRACE}
 
 eiscp:
   receiver:

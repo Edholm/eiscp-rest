@@ -1,6 +1,7 @@
 package pub.edholm.eiscprest.eiscp
 
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
@@ -50,7 +51,7 @@ enum class Command(val asString: String, val payloadDesc: Map<String, String> = 
 data class ISCPCommand(val command: Command = Command.UNKNOWN,
                        val payload: String = "") {
   companion object {
-    private val log: Logger = Logger.getLogger(ISCPCommand::class.java)
+    private val log: Logger = LoggerFactory.getLogger(ISCPCommand::class.java)
     private const val SUFFIX_LEN = 2
     private const val CMD_LENGTH = 5
     private const val CR: Byte = 0x0D

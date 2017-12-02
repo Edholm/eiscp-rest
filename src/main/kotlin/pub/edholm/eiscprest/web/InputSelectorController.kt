@@ -1,23 +1,23 @@
 package pub.edholm.eiscprest.web
 
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
-import pub.edholm.eiscprest.CurrentState
+import pub.edholm.eiscprest.services.StateService
+import pub.edholm.eiscprest.domain.InputSelection
 import pub.edholm.eiscprest.eiscp.Command
-import pub.edholm.eiscprest.eiscp.CommonCommands
 import pub.edholm.eiscprest.eiscp.ISCPCommand
 import pub.edholm.eiscprest.queues.OutputQueue
 
 @RestController
 @RequestMapping("/input")
 class InputSelectorController(private val outputQueue: OutputQueue,
-                              private val currentState: CurrentState,
-                              private val log: Logger = Logger.getLogger(InputSelectorController::class.java)) {
+                              private val currentState: StateService,
+                              private val log: Logger = LoggerFactory.getLogger(InputSelectorController::class.java)) {
   @GetMapping
-  fun getCurrentInput(): String {
+  fun getCurrentInput(): InputSelection? {
     log.trace("Get current input")
-    outputQueue.put(CommonCommands.inputSelectorQuery())
-    return currentState.currentInput()
+    return currentState.current().currentInput
   }
 
   @PostMapping("/next")

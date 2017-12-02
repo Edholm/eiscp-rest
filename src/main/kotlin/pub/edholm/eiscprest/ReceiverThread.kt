@@ -1,6 +1,7 @@
 package pub.edholm.eiscprest
 
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import pub.edholm.eiscprest.eiscp.ISCPCommand
 import pub.edholm.eiscprest.eiscp.ISCPHeader
@@ -11,7 +12,7 @@ import java.net.Socket
 @Component
 class ReceiverThread(private val socket: Socket,
                      private val inputQueue: InputQueue,
-                     private val log: Logger = Logger.getLogger(ReceiverThread::class.java)) : Thread("msgReceiver") {
+                     private val log: Logger = LoggerFactory.getLogger(ReceiverThread::class.java)) : Thread("msgReceiver") {
 
   private fun assertSocketNotClosed() {
     Thread.sleep(2500)

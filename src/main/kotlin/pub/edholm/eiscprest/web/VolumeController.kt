@@ -1,8 +1,9 @@
 package pub.edholm.eiscprest.web
 
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
-import pub.edholm.eiscprest.CurrentState
+import pub.edholm.eiscprest.services.StateService
 import pub.edholm.eiscprest.eiscp.Command
 import pub.edholm.eiscprest.eiscp.ISCPCommand
 import pub.edholm.eiscprest.queues.OutputQueue
@@ -10,24 +11,22 @@ import pub.edholm.eiscprest.queues.OutputQueue
 @RestController
 @RequestMapping("/volume")
 class VolumeController(private val outputQueue: OutputQueue,
-                       private val currentState: CurrentState,
-                       private val log: Logger = Logger.getLogger(VolumeController::class.java)) {
+                       private val currentState: StateService,
+                       private val log: Logger = LoggerFactory.getLogger(VolumeController::class.java)) {
   @GetMapping
   fun currentVolume(): Int {
     log.trace("Fetch current volume")
-    outputQueue.put(ISCPCommand(Command.MASTER_VOLUME, "QSTN"))
-    return currentState.masterVolume()
+    return currentState.current().masterVolume?.level ?: 50
   }
 
   @PostMapping("/{newVolume}")
-  fun setVolume(@PathVariable newVolume: Int): Int {
+  fun setVolume(@PathVariable newVolume: Int) {
     val newVolumeHex = newVolume.toTwoCharHex()
     log.trace("Set volume to $newVolume, as hex: $newVolumeHex")
     if (newVolume < 0 || newVolume > 100) {
       throw IllegalArgumentException("Invalid volume. Expected 0<x<100, got $newVolume")
     }
     outputQueue.put(ISCPCommand(Command.MASTER_VOLUME, newVolumeHex))
-    return currentState.masterVolume()
   }
 
   @PostMapping("/increase")
@@ -46,7 +45,7 @@ class VolumeController(private val outputQueue: OutputQueue,
   fun isMuted(): Boolean {
     log.trace("Is muted")
     outputQueue.put(ISCPCommand(Command.AUDIO_MUTING, "QSTN"))
-    return currentState.isMuted()
+    return currentState.current().isPowered ?: false
   }
 
   @PostMapping("/toggle-mute")

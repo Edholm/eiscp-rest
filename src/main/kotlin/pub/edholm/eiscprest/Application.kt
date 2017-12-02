@@ -1,30 +1,26 @@
 package pub.edholm.eiscprest
 
-import org.apache.log4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.scheduling.annotation.EnableAsync
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import pub.edholm.eiscprest.queues.CommandProcessor
 import java.net.Socket
-import java.util.concurrent.locks.ReentrantLock
 
 @SpringBootApplication
+@EnableAsync
 class Application {
 
-  private val log = Logger.getLogger(Application::class.java)
+  private val log = LoggerFactory.getLogger(Application::class.java)
 
-  @Bean(name = arrayOf("receiverSocket"))
+  @Bean(name = ["receiverSocket"])
   fun getSocket(properties: Properties): Socket {
     log.trace("Connecting to ${properties.receiver.hostname}:${properties.receiver.port}")
     return Socket(properties.receiver.hostname, properties.receiver.port)
   }
-
-  @Bean
-  fun getCurrentState(reentrantLock: ReentrantLock) = CurrentState(update = reentrantLock)
-
-  @Bean(name = arrayOf("updateStateLock"))
-  fun getUpdateStateLock() = ReentrantLock()
 
   @Bean
   fun initThreads(receiver: ReceiverThread, sender: SenderThread, commandProcessor: CommandProcessor) = CommandLineRunner {
@@ -35,6 +31,9 @@ class Application {
     log.trace("Starting command processor")
     commandProcessor.start()
   }
+
+  @Bean
+  fun executor() = ThreadPoolTaskExecutor()
 }
 
 fun main(args: Array<String>) {
