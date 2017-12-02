@@ -14,7 +14,7 @@ class CommandProcessor(private val inputQueue: InputQueue,
     while (true) {
       val lastCommand = inputQueue.pop()
       log.trace("Processing $lastCommand")
-      currentState.updateState(lastCommand)
+      currentState.updateStateFromCommand(lastCommand)
     }
   }
 }

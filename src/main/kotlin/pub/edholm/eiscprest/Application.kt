@@ -1,13 +1,18 @@
 package pub.edholm.eiscprest
 
 import org.slf4j.LoggerFactory
+import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.http.codec.ServerSentEvent
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import pub.edholm.eiscprest.domain.State
 import pub.edholm.eiscprest.queues.CommandProcessor
+import pub.edholm.eiscprest.services.StateService
+import reactor.core.publisher.ReplayProcessor
 import java.net.Socket
 
 @SpringBootApplication
@@ -33,7 +38,18 @@ class Application {
   }
 
   @Bean
+  fun onApplicationStart(stateService: StateService) = ApplicationRunner {
+    if (stateService.current().hasMissingFields()) {
+      log.info("No current state saved, requesting update")
+      stateService.requestStateUpdate()
+    }
+  }
+
+  @Bean
   fun executor() = ThreadPoolTaskExecutor()
+
+  @Bean
+  fun getSSESEmitter(): ReplayProcessor<ServerSentEvent<State>> = ReplayProcessor.create(1)
 }
 
 fun main(args: Array<String>) {
