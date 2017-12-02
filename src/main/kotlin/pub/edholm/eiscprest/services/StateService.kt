@@ -28,13 +28,18 @@ class StateService(
 
   fun updatesStream(): Flux<ServerSentEvent<State>> = sseStateEmitter
 
-  fun requestStateUpdate() {
-    log.trace("Request full state update")
-    outputQueue.put(ISCPCommand(Command.AUDIO_MUTING, "QSTN"))
-    outputQueue.put(ISCPCommand(Command.MASTER_VOLUME, "QSTN"))
-    outputQueue.put(ISCPCommand(Command.POWER, "QSTN"))
-    outputQueue.put(ISCPCommand(Command.INPUT_SELECTOR, "QSTN"))
+  fun requestStateUpdateOn(vararg commands: Command) {
+    if (commands.isEmpty()) {
+      return
+    }
+    log.trace("Request state update using ${commands.asList()}")
+    commands.forEach {
+      outputQueue.put(ISCPCommand(it, "QSTN"))
+    }
+  }
 
+  fun requestFullStateUpdate() {
+    requestStateUpdateOn(Command.AUDIO_MUTING, Command.MASTER_VOLUME, Command.POWER, Command.INPUT_SELECTOR)
   }
 
   fun updateStateFromCommand(cmd: ISCPCommand) {

@@ -13,13 +13,13 @@ import pub.edholm.eiscprest.queues.OutputQueue
 @RestController
 @RequestMapping("/power")
 class PowerController(private val outputQueue: OutputQueue,
-                      private val currentState: StateService,
+                      private val stateService: StateService,
                       private val log: Logger = LoggerFactory.getLogger(PowerController::class.java)) {
 
   @GetMapping
   fun getPowerStatus(): Boolean? {
     log.trace("Power query")
-    return currentState.current().isPowered
+    return stateService.current().isPowered
   }
 
   @PostMapping("/on")
@@ -39,7 +39,7 @@ class PowerController(private val outputQueue: OutputQueue,
     log.trace("Toggle power")
 
     outputQueue.put(CommonCommands.powerQuery())
-    if (currentState.current().isPowered == true) {
+    if (stateService.current().isPowered == true) {
       powerOff()
     } else {
       powerOn()

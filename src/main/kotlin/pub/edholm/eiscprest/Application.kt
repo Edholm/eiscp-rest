@@ -41,7 +41,7 @@ class Application {
   fun onApplicationStart(stateService: StateService) = ApplicationRunner {
     if (stateService.current().hasMissingFields()) {
       log.info("No current state saved, requesting update")
-      stateService.requestStateUpdate()
+      stateService.requestFullStateUpdate()
     }
   }
 

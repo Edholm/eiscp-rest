@@ -12,12 +12,12 @@ import pub.edholm.eiscprest.queues.OutputQueue
 @RestController
 @RequestMapping("/input")
 class InputSelectorController(private val outputQueue: OutputQueue,
-                              private val currentState: StateService,
+                              private val stateService: StateService,
                               private val log: Logger = LoggerFactory.getLogger(InputSelectorController::class.java)) {
   @GetMapping
   fun getCurrentInput(): InputSelection? {
     log.trace("Get current input")
-    return currentState.current().currentInput
+    return stateService.current().currentInput
   }
 
   @PostMapping("/next")

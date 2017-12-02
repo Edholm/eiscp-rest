@@ -18,5 +18,5 @@ class StateController(private val stateService: StateService) {
   fun updateStream() = stateService.updatesStream()
 
   @PostMapping
-  fun requestStateUpdate() = stateService.requestStateUpdate()
+  fun requestStateUpdate() = stateService.requestFullStateUpdate()
 }

@@ -11,12 +11,12 @@ import pub.edholm.eiscprest.queues.OutputQueue
 @RestController
 @RequestMapping("/volume")
 class VolumeController(private val outputQueue: OutputQueue,
-                       private val currentState: StateService,
+                       private val stateService: StateService,
                        private val log: Logger = LoggerFactory.getLogger(VolumeController::class.java)) {
   @GetMapping
   fun currentVolume(): Int {
     log.trace("Fetch current volume")
-    return currentState.current().masterVolume?.level ?: 50
+    return stateService.current().masterVolume?.level ?: 50
   }
 
   @PostMapping("/{newVolume}")
@@ -45,7 +45,7 @@ class VolumeController(private val outputQueue: OutputQueue,
   fun isMuted(): Boolean {
     log.trace("Is muted")
     outputQueue.put(ISCPCommand(Command.AUDIO_MUTING, "QSTN"))
-    return currentState.current().isPowered ?: false
+    return stateService.current().isPowered ?: false
   }
 
   @PostMapping("/toggle-mute")
