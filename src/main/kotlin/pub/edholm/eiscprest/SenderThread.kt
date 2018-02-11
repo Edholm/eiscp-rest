@@ -8,9 +8,11 @@ import pub.edholm.eiscprest.queues.OutputQueue
 import java.net.Socket
 
 @Component
-class SenderThread(private val socket: Socket,
-                   private val outputQueue: OutputQueue,
-                   private val log: Logger = LoggerFactory.getLogger(SenderThread::class.java)) : Thread("msgSender") {
+class SenderThread(
+  private val socket: Socket,
+  private val outputQueue: OutputQueue,
+  private val log: Logger = LoggerFactory.getLogger(SenderThread::class.java)
+) : Thread("msgSender") {
   override fun run() {
     val output = socket.getOutputStream()
     while (!socket.isClosed) {

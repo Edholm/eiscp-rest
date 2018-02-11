@@ -3,10 +3,12 @@ package pub.edholm.eiscprest.eiscp
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
-data class ISCPHeader(val magicStr: String = DEFAULT_MAGIC_STR,
-                      val headerSize: Int = DEFAULT_SIZE,
-                      val messageSize: Int,
-                      val version: Byte = DEFAULT_VERSION) {
+data class ISCPHeader(
+  val magicStr: String = DEFAULT_MAGIC_STR,
+  val headerSize: Int = DEFAULT_SIZE,
+  val messageSize: Int,
+  val version: Byte = DEFAULT_VERSION
+) {
   companion object {
     const val DEFAULT_MAGIC_STR = "ISCP"
     const val DEFAULT_SIZE = 16

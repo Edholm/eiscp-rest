@@ -16,6 +16,7 @@ data class InputSelection(@JsonValue val input: String) {
       InputSelection("CD"),
       InputSelection("TUNER"),
       InputSelection("NET"),
-      InputSelection("Bluetooth"));
+      InputSelection("Bluetooth")
+    );
   }
 }

@@ -3,16 +3,18 @@ package pub.edholm.eiscprest.web
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
-import pub.edholm.eiscprest.services.StateService
 import pub.edholm.eiscprest.eiscp.Command
 import pub.edholm.eiscprest.eiscp.ISCPCommand
 import pub.edholm.eiscprest.queues.OutputQueue
+import pub.edholm.eiscprest.services.StateService
 
 @RestController
 @RequestMapping("/volume")
-class VolumeController(private val outputQueue: OutputQueue,
-                       private val stateService: StateService,
-                       private val log: Logger = LoggerFactory.getLogger(VolumeController::class.java)) {
+class VolumeController(
+  private val outputQueue: OutputQueue,
+  private val stateService: StateService,
+  private val log: Logger = LoggerFactory.getLogger(VolumeController::class.java)
+) {
   @GetMapping
   fun currentVolume(): Int {
     log.trace("Fetch current volume")

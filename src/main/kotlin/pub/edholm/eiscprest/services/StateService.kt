@@ -19,7 +19,8 @@ class StateService(
   private var currentState: State = State(),
   private val outputQueue: OutputQueue,
   private val sseStateEmitter: ReplayProcessor<ServerSentEvent<State>>,
-  private val log: Logger = LoggerFactory.getLogger(StateService::class.java)) {
+  private val log: Logger = LoggerFactory.getLogger(StateService::class.java)
+) {
 
   fun current(): State {
     log.trace("Returning current state: $currentState")

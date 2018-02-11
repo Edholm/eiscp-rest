@@ -10,9 +10,11 @@ import java.io.DataInputStream
 import java.net.Socket
 
 @Component
-class ReceiverThread(private val socket: Socket,
-                     private val inputQueue: InputQueue,
-                     private val log: Logger = LoggerFactory.getLogger(ReceiverThread::class.java)) : Thread("msgReceiver") {
+class ReceiverThread(
+  private val socket: Socket,
+  private val inputQueue: InputQueue,
+  private val log: Logger = LoggerFactory.getLogger(ReceiverThread::class.java)
+) : Thread("msgReceiver") {
 
   private fun assertSocketNotClosed() {
     Thread.sleep(2500)

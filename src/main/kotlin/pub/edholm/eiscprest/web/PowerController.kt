@@ -6,15 +6,17 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import pub.edholm.eiscprest.services.StateService
 import pub.edholm.eiscprest.eiscp.CommonCommands
 import pub.edholm.eiscprest.queues.OutputQueue
+import pub.edholm.eiscprest.services.StateService
 
 @RestController
 @RequestMapping("/power")
-class PowerController(private val outputQueue: OutputQueue,
-                      private val stateService: StateService,
-                      private val log: Logger = LoggerFactory.getLogger(PowerController::class.java)) {
+class PowerController(
+  private val outputQueue: OutputQueue,
+  private val stateService: StateService,
+  private val log: Logger = LoggerFactory.getLogger(PowerController::class.java)
+) {
 
   @GetMapping
   fun getPowerStatus(): Boolean? {

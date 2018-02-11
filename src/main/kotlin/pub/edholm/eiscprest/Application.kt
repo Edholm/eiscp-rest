@@ -6,9 +6,13 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import org.springframework.web.reactive.config.CorsRegistry
+import org.springframework.web.reactive.config.WebFluxConfigurer
+import org.springframework.web.reactive.config.WebFluxConfigurerComposite
 import pub.edholm.eiscprest.domain.State
 import pub.edholm.eiscprest.queues.CommandProcessor
 import pub.edholm.eiscprest.services.StateService
@@ -17,6 +21,7 @@ import java.net.Socket
 
 @SpringBootApplication
 @EnableAsync
+@Configuration
 class Application {
 
   private val log = LoggerFactory.getLogger(Application::class.java)
@@ -28,14 +33,15 @@ class Application {
   }
 
   @Bean
-  fun initThreads(receiver: ReceiverThread, sender: SenderThread, commandProcessor: CommandProcessor) = CommandLineRunner {
-    log.trace("Starting receiver thread")
-    receiver.start()
-    log.trace("Starting sender thread")
-    sender.start()
-    log.trace("Starting command processor")
-    commandProcessor.start()
-  }
+  fun initThreads(receiver: ReceiverThread, sender: SenderThread, commandProcessor: CommandProcessor) =
+    CommandLineRunner {
+      log.trace("Starting receiver thread")
+      receiver.start()
+      log.trace("Starting sender thread")
+      sender.start()
+      log.trace("Starting command processor")
+      commandProcessor.start()
+    }
 
   @Bean
   fun onApplicationStart(stateService: StateService) = ApplicationRunner {
@@ -50,6 +56,18 @@ class Application {
 
   @Bean
   fun getSSESEmitter(): ReplayProcessor<ServerSentEvent<State>> = ReplayProcessor.create(1)
+
+  @Bean
+  fun corsConfigurer(): WebFluxConfigurer {
+    return object : WebFluxConfigurerComposite() {
+      override fun addCorsMappings(registry: CorsRegistry) {
+        registry.addMapping("/**")
+          .allowedOrigins("*")
+          .allowedHeaders("*")
+          .allowedMethods("*")
+      }
+    }
+  }
 }
 
 fun main(args: Array<String>) {

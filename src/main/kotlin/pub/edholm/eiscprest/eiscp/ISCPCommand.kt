@@ -9,7 +9,8 @@ enum class Command(val asString: String, val payloadDesc: Map<String, String> = 
   POWER("!1PWR", mapOf("00" to "off", "01" to "on", "QSTN" to "query")),
   MASTER_VOLUME("!1MVL"),
   AUDIO_MUTING("!1AMT", mapOf("00" to "off", "01" to "on", "QSTN" to "query", "TG" to "toggle")),
-  INPUT_SELECTOR("!1SLI",
+  INPUT_SELECTOR(
+    "!1SLI",
     mapOf(
       "01" to "CBL/SAT",
       "03" to "AUX",
@@ -22,7 +23,9 @@ enum class Command(val asString: String, val payloadDesc: Map<String, String> = 
       "23" to "CD",
       "24" to "TUNER",
       "2B" to "NET",
-      "2E" to "Bluetooth")),
+      "2E" to "Bluetooth"
+    )
+  ),
   LISTENING_MODE("!1LMD"),
   DIMMER_LEVEL("!1DIM"),
   MUSIC_OPTIMIZER("!1MOT"),
@@ -34,7 +37,10 @@ enum class Command(val asString: String, val payloadDesc: Map<String, String> = 
   NET_MENU_STATUS("!1NMS"),
   ZONE2_POWER("!1ZPW"),
   ZONE2_SELECTOR("!1SLZ"),
-  UPDATE("!1UPD", mapOf("00" to "NO_NEW_FIRMWARE", "01" to "EXIST_NEW_FIRMWARE", "CMP" to "UPDATE_COMPLETE", "QSTN" to "query")),
+  UPDATE(
+    "!1UPD",
+    mapOf("00" to "NO_NEW_FIRMWARE", "01" to "EXIST_NEW_FIRMWARE", "CMP" to "UPDATE_COMPLETE", "QSTN" to "query")
+  ),
 
   UNKNOWN("<N/A>");
 
@@ -48,8 +54,10 @@ enum class Command(val asString: String, val payloadDesc: Map<String, String> = 
   }
 }
 
-data class ISCPCommand(val command: Command = Command.UNKNOWN,
-                       val payload: String = "") {
+data class ISCPCommand(
+  val command: Command = Command.UNKNOWN,
+  val payload: String = ""
+) {
   companion object {
     private val log: Logger = LoggerFactory.getLogger(ISCPCommand::class.java)
     private const val SUFFIX_LEN = 2

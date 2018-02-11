@@ -6,9 +6,11 @@ import org.springframework.stereotype.Component
 import pub.edholm.eiscprest.services.StateService
 
 @Component
-class CommandProcessor(private val inputQueue: InputQueue,
-                       private val currentState: StateService,
-                       private val log: Logger = LoggerFactory.getLogger(CommandProcessor::class.java)) : Thread("commandProcessor") {
+class CommandProcessor(
+  private val inputQueue: InputQueue,
+  private val currentState: StateService,
+  private val log: Logger = LoggerFactory.getLogger(CommandProcessor::class.java)
+) : Thread("commandProcessor") {
 
   override fun run() {
     while (true) {
