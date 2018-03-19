@@ -6,6 +6,21 @@ spring:
     ansi:
       enabled: ALWAYS
 
+management:
+  endpoint:
+    prometheus:
+      enabled: true
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: [health, prometheus]
+  metrics:
+    export:
+      prometheus:
+        enabled: ${PROMETHEUS_ENABLED:true}
+
 logging:
   pattern:
     level: '%5p%X{reqId}'

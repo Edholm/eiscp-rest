@@ -1,9 +1,11 @@
 package pub.edholm.eiscprest
 
+import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
+import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -68,6 +70,15 @@ class Application {
       }
     }
   }
+
+  @Bean
+  fun commonTags(): MeterRegistryCustomizer<MeterRegistry> {
+    val appEnv = System.getenv("APP_ENV") ?: "devel"
+    return MeterRegistryCustomizer {
+      it.config().commonTags("app", "eiscp-rest", "env", appEnv)
+    }
+  }
+
 }
 
 fun main(args: Array<String>) {

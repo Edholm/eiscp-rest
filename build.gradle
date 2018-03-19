@@ -1,13 +1,11 @@
 buildscript {
     ext {
-        kotlinVersion = '1.2.21'
-        springBootVersion = '2.0.0.RC1'
+        kotlinVersion = '1.2.30'
+        springBootVersion = '2.0.0.RELEASE'
         junitJupiterVersion = '5.0.3'
     }
     repositories {
         mavenCentral()
-        maven { url "https://repo.spring.io/snapshot" }
-        maven { url "https://repo.spring.io/milestone" }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -27,7 +25,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 group = 'pub.edholm'
-version = '1.0.0-RC3'
+version = '1.0.0'
 sourceCompatibility = 1.8
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
@@ -38,8 +36,6 @@ compileTestKotlin {
 
 repositories {
     mavenCentral()
-    maven { url "https://repo.spring.io/snapshot" }
-    maven { url "https://repo.spring.io/milestone" }
 }
 
 
@@ -50,6 +46,9 @@ dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlinVersion}")
     compile("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
     compile('com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4.1')
+
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("io.micrometer:micrometer-registry-prometheus:1.0.2")
 
     runtime('org.springframework.boot:spring-boot-devtools')
     testCompile('org.springframework.boot:spring-boot-starter-test')
