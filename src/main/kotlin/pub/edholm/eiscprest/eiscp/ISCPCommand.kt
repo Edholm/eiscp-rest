@@ -56,7 +56,8 @@ enum class Command(val asString: String, val payloadDesc: Map<String, String> = 
 
 data class ISCPCommand(
   val command: Command = Command.UNKNOWN,
-  val payload: String = ""
+  val payload: String = "",
+  val rawCommand: String = command.asString
 ) {
   companion object {
     private val log: Logger = LoggerFactory.getLogger(ISCPCommand::class.java)
@@ -66,14 +67,14 @@ data class ISCPCommand(
     private const val LF: Byte = 0x0A
 
     fun valueOf(bytes: ByteArray): ISCPCommand {
-      val cmd = String(bytes.copyOfRange(0, CMD_LENGTH), StandardCharsets.UTF_8)
+      val rawCmd = String(bytes.copyOfRange(0, CMD_LENGTH), StandardCharsets.UTF_8)
       val payload = String(bytes.copyOfRange(CMD_LENGTH, bytes.size - SUFFIX_LEN - 1), StandardCharsets.UTF_8)
-      val parsedCmd = Command.parse(cmd)
-      if (parsedCmd == Command.UNKNOWN) {
-        log.debug("Unknown command: '$cmd'")
+      val cmd = Command.parse(rawCmd)
+      if (cmd == Command.UNKNOWN) {
+        log.debug("Unknown command: '$rawCmd'")
       }
 
-      return ISCPCommand(parsedCmd, payload)
+      return ISCPCommand(cmd, payload, rawCmd)
     }
   }
 

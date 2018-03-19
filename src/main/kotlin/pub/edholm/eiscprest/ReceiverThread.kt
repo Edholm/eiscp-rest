@@ -1,5 +1,6 @@
 package pub.edholm.eiscprest
 
+import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -13,8 +14,10 @@ import java.net.Socket
 class ReceiverThread(
   private val socket: Socket,
   private val inputQueue: InputQueue,
-  private val log: Logger = LoggerFactory.getLogger(ReceiverThread::class.java)
+  private val meterRegistry: MeterRegistry
 ) : Thread("msgReceiver") {
+
+  private val log: Logger = LoggerFactory.getLogger(ReceiverThread::class.java)
 
   private fun assertSocketNotClosed() {
     Thread.sleep(2500)
@@ -51,6 +54,9 @@ class ReceiverThread(
       log.trace("Message header: $header")
       log.debug("Received $msg")
       inputQueue.put(msg)
+
+      meterRegistry.counter("eiscp-rest.messages.incoming", "command", msg.rawCommand, "parsedCmd", msg.command.name)
+        .increment()
     }
   }
 }
