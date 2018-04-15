@@ -1,8 +1,8 @@
 buildscript {
     ext {
-        kotlinVersion = '1.2.30'
-        springBootVersion = '2.0.0.RELEASE'
-        junitJupiterVersion = '5.0.3'
+        kotlinVersion = '1.2.31'
+        springBootVersion = '2.0.1.RELEASE'
+        junitJupiterVersion = '5.1.1'
     }
     repositories {
         mavenCentral()
@@ -48,7 +48,7 @@ dependencies {
     compile('com.fasterxml.jackson.module:jackson-module-kotlin:2.9.4.1')
 
     compile("org.springframework.boot:spring-boot-starter-actuator")
-    compile("io.micrometer:micrometer-registry-prometheus:1.0.2")
+    compile("io.micrometer:micrometer-registry-prometheus:1.0.3")
 
     runtime('org.springframework.boot:spring-boot-devtools')
     testCompile('org.springframework.boot:spring-boot-starter-test')
